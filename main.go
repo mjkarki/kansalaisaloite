@@ -119,6 +119,8 @@ func main() {
 	if len(os.Args) < 2 {
 		fmt.Println("Käyttö:")
 		fmt.Println("    " + os.Args[0] + ` ”hakuteksti"`)
+		fmt.Println("  tai")
+		fmt.Println("    " + os.Args[0] + ` -a`)
 		os.Exit(1)
 	}
 
@@ -129,14 +131,18 @@ func main() {
 
 	for _, initiative := range aloitteet {
 		nimi := initiative.Name["fi"].(string)
-		nimi_l := strings.ToLower(nimi)
-		if strings.Contains(nimi_l, search) {
-			url := initiative.ID
-			data = getData(url)
-			initiativeStruct := getInitiativeStructFromJSON[InitiativeInfo](data)
-			fmt.Println("- " + nimi + ":")
-			fmt.Println("  Kannatusilmoituksia:", initiativeStruct.SupportCount)
-			fmt.Println("  Keräys päättyy:     ", initiativeStruct.EndDate)
+		if search != "-a" {
+			nimi_l := strings.ToLower(nimi)
+			if strings.Contains(nimi_l, search) {
+				url := initiative.ID
+				data = getData(url)
+				initiativeStruct := getInitiativeStructFromJSON[InitiativeInfo](data)
+				fmt.Println("- " + nimi + ":")
+				fmt.Println("  Kannatusilmoituksia:", initiativeStruct.SupportCount)
+				fmt.Println("  Keräys päättyy:     ", initiativeStruct.EndDate)
+			}
+		} else {
+			fmt.Println("- " + nimi)
 		}
 	}
 }
