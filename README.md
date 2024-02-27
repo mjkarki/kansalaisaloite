@@ -3,10 +3,12 @@
 Pieni komentorivityökalu kansalaisaloitteiden äänimäärien ja takarajapäivän
 tarkistamiseen.
 
-Käyttö:
+    Käyttö:
+      kansalaisaloite [-h | --help | -a | --all] ["hakuteksti" ...]
 
-    kansalaisaloite "hakuteksti"
-    kansalaisaloite -a
+      "hakuteksti"  etsii hakutekstiä aloitteiden otsikoista
+      -h | --help   tulostaa tämän ohjeen
+      -a | --all    tulostaa kaikki kansalaisaloitteet
 
 Listaa kaikki käynnissä olevat ja päättyneet kansalaisaloitteet, joiden nimessä
 esiintyy "hakuteksti". "-a" palauttaa kaikki Kansalaisaloite.fi-sivustolla
