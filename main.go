@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -10,7 +11,7 @@ import (
 	"strings"
 )
 
-const URL string = "https://www.kansalaisaloite.fi/api/v1/initiatives?limit=50"
+const URL string = "https://www.kansalaisaloite.fi/api/v1/initiatives?limit=50&orderBy=createdNewest&offset="
 
 type Initiative struct {
 	ID                       string                 `json:"id"`
@@ -115,23 +116,41 @@ func getInitiativeStructFromJSON[T InitiativeStruct](data []byte) T {
 
 func main() {
 	var data []byte
+	var aloitteet []Initiative = []Initiative{}
+	var listall = false
+	var offset = 0
+	var nimi string
 
 	if len(os.Args) < 2 {
 		fmt.Println("Käyttö:")
 		fmt.Println("    " + os.Args[0] + ` ”hakuteksti"`)
 		fmt.Println("  tai")
 		fmt.Println("    " + os.Args[0] + ` -a`)
-		os.Exit(1)
+		os.Exit(0)
 	}
 
 	search := os.Args[1]
 
-	data = getData(URL)
-	aloitteet := getInitiativeStructFromJSON[[]Initiative](data)
+	if search == "-a" {
+		fmt.Println("Listataan kaikki aloitteet:")
+		listall = true
+	}
+
+	data = getData(fmt.Sprintf("%s%d", URL, offset))
+	for bytes.Compare(data, []byte{91, 93}) != 0 {
+		a := getInitiativeStructFromJSON[[]Initiative](data)
+		aloitteet = append(aloitteet, a...)
+		offset += 50
+		data = getData(fmt.Sprintf("%s%d", URL, offset))
+	}
 
 	for _, initiative := range aloitteet {
-		nimi := initiative.Name["fi"].(string)
-		if search != "-a" {
+		if initiative.Name["fi"] == nil {
+			nimi = initiative.Name["sv"].(string)
+		} else {
+			nimi = initiative.Name["fi"].(string)
+		}
+		if listall == false {
 			nimi_l := strings.ToLower(nimi)
 			if strings.Contains(nimi_l, search) {
 				url := initiative.ID
